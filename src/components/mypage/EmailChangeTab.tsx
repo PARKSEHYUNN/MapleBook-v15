@@ -139,7 +139,7 @@ export default function EmailChangeTab({
             name="email"
             id="useremail"
             value={(user.email as string) || ""}
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="block w-full rounded-lg border border-gray-300 bg-gray-200 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
             placeholder="example@example.com"
             disabled
           ></input>
@@ -177,7 +177,7 @@ export default function EmailChangeTab({
             id="userpassword"
             value={password}
             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
-            placeholder="example@example.com"
+            placeholder="비밀번호"
             onChange={(e) => setPassword(e.target.value)}
             required
           ></input>

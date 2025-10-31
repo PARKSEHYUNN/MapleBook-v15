@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -11,12 +11,52 @@ import {
   faTriangleExclamation,
   faSpinner,
   faRightFromBracket,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
+
+function LoginMessage() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
+
+  if (!message) return null;
+
+  if (message === "email_changed_success") {
+    return (
+      <span className="mb-3 flex items-center rounded-lg bg-green-600 ps-5 pe-5 pt-2.5 pb-2.5 text-sm text-white">
+        <FontAwesomeIcon icon={faCheckCircle} size="sm" className="me-1" />
+        이메일 변경이 완료되었습니다. 새 이메일로 로그인 하세요.
+      </span>
+    );
+  } else if (message === "email_changed_expired") {
+    return (
+      <span className="mb-3 flex items-center rounded-lg bg-red-600 ps-5 pe-5 pt-2.5 pb-2.5 text-sm text-white">
+        <FontAwesomeIcon
+          icon={faTriangleExclamation}
+          size="sm"
+          className="me-1"
+        />
+        인증 링크가 만료되었습니다. 다시 시도해주세요.
+      </span>
+    );
+  } else {
+    return (
+      <span className="mb-3 flex items-center rounded-lg bg-red-600 ps-5 pe-5 pt-2.5 pb-2.5 text-sm text-white">
+        <FontAwesomeIcon
+          icon={faTriangleExclamation}
+          size="sm"
+          className="me-1"
+        />
+        인증 링크를 확인할 수 없습니다. 계속 반복시 이메일 변경을 다시
+        시도해주세요.
+      </span>
+    );
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/mypage";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,7 +102,7 @@ export default function LoginPage() {
         if (saveEmail) localStorage.setItem("savedEmail", email);
         else localStorage.removeItem("savedEmail");
 
-        router.push(callbackUrl);
+        window.location.href = callbackUrl;
       }
     } catch (err) {
       setError("로그인 중 예기치 않은 오류가 발생했습니다.");
@@ -72,6 +112,10 @@ export default function LoginPage() {
   return (
     <div className="mt-3 flex w-full flex-col items-center justify-center rounded-lg bg-transparent p-5">
       <h1 className="mb-3 text-2xl font-bold dark:text-white">로그인</h1>
+
+      <Suspense fallback={null}>
+        <LoginMessage />
+      </Suspense>
 
       {error && (
         <span className="mb-3 flex items-center rounded-lg bg-red-600 ps-5 pe-5 pt-2.5 pb-2.5 text-sm text-white">

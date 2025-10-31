@@ -42,10 +42,15 @@ export async function changeEmail(
   const userId = session.user.id;
   const oldEmail = session.user.email;
 
-  console.log(newEmail, password);
-
   if (!newEmail || !password)
     return { success: false, error: "MISSING_REQUIRED_FIELDS" };
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: oldEmail,
+    password: password,
+  });
+
+  if (signInError) return { success: false, error: "INVALID_PASSWORD" };
 
   if (newEmail === oldEmail)
     return { success: false, error: "EMAIL_UNCHANGED" };

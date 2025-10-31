@@ -115,6 +115,15 @@ export default function NavbarClient({ session }: NavbarClientProps) {
           )}
           {status === "authenticated" && user && (
             <>
+              <Link href={"/mypage"}>
+                <button
+                  type="button"
+                  className="me-1 cursor-pointer rounded-lg bg-orange-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800"
+                >
+                  내 정보
+                </button>
+              </Link>
+
               <button
                 type="button"
                 className="cursor-pointer rounded-lg bg-orange-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800"

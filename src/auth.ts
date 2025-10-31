@@ -25,11 +25,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (trigger === "update") {
         const { data: dbUser } = await supabase
           .from("users")
-          .select("main_character_ocid, nexon_api_key")
+          .select("email, main_character_ocid, nexon_api_key")
           .eq("id", token.id)
           .single();
 
         if (dbUser) {
+          token.email = dbUser.email;
           token.mainCharacterOcid = dbUser.main_character_ocid;
           token.nexonApiKey = dbUser.nexon_api_key;
         }
