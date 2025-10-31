@@ -2,11 +2,15 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useState, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { DefaultSession } from "next-auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faSpinner,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { changeEmail } from "@/actions/user-actions";
 
@@ -21,8 +25,16 @@ interface EmailChangeTabProps {
   updateSession: () => void;
 }
 
-const initialState = {
+interface EmailFormState {
+  success: boolean;
+  error?: string;
+  message?: string;
+}
+
+const initialState: EmailFormState = {
   success: false,
+  error: undefined,
+  message: undefined,
 };
 
 function SubmitButton() {
@@ -47,7 +59,7 @@ export default function EmailChangeTab({
   user,
   updateSession,
 }: EmailChangeTabProps) {
-  const [formState, formAction] = useFormState(changeEmail, initialState);
+  const [formState, formAction] = useActionState(changeEmail, initialState);
 
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -89,4 +101,90 @@ export default function EmailChangeTab({
     }
     return null;
   };
+
+  const message = getMessage(formState);
+
+  return (
+    <div>
+      <h2 className="mb-4 text-xl font-bold dark:text-white">이메일 변경</h2>
+      <p className="mb-4 text-sm dark:text-gray-400">
+        새 이메일 주소로 확인 링크가 발송됩니다.
+      </p>
+
+      {message && (
+        <span
+          className={`mb-3 flex items-center rounded-lg bg-${message.type === "error" ? "red" : "green"}-600 ps-5 pe-5 pt-2.5 pb-2.5 text-sm text-white`}
+        >
+          <FontAwesomeIcon
+            icon={
+              message.type === "error" ? faTriangleExclamation : faCheckCircle
+            }
+            size="sm"
+            className="me-1"
+          />
+          {message.text}
+        </span>
+      )}
+
+      <form action={formAction} className="space-y-4">
+        <div className="mb-4">
+          <label
+            htmlFor="useremail"
+            className="mb-2 block text-start text-sm font-medium text-gray-900 dark:text-white"
+          >
+            현재 이메일
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="useremail"
+            value={(user.email as string) || ""}
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            placeholder="example@example.com"
+            disabled
+          ></input>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="usernewemail"
+            className="mb-2 block text-start text-sm font-medium text-gray-900 dark:text-white"
+          >
+            새 이메일
+          </label>
+          <input
+            type="email"
+            name="newEmail"
+            id="usernewemail"
+            value={newEmail}
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            placeholder="example@example.com"
+            onChange={(e) => setNewEmail(e.target.value)}
+            required
+          ></input>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="usernewemail"
+            className="mb-2 block text-start text-sm font-medium text-gray-900 dark:text-white"
+          >
+            현재 비밀번호
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="userpassword"
+            value={password}
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            placeholder="example@example.com"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          ></input>
+        </div>
+
+        <SubmitButton />
+      </form>
+    </div>
+  );
 }
