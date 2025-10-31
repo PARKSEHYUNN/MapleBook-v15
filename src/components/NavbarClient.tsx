@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import User from "./User";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -20,6 +21,8 @@ interface NavbarClientProps {
 export default function NavbarClient({ session }: NavbarClientProps) {
   const status = session ? "authenticated" : "unauthenticated";
   const user = session?.user;
+
+  console.log(user);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const mainMenuRef = useRef<HTMLDivElement>(null);
@@ -73,9 +76,9 @@ export default function NavbarClient({ session }: NavbarClientProps) {
             <ul className="flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium md:mt-0 md:flex-row md:space-x-4 md:border-0 md:bg-white md:p-0 dark:border-gray-700 dark:bg-gray-800 md:dark:bg-gray-900">
               <li>
                 <Link
-                  href={"/user"}
+                  href={"/character"}
                   className={
-                    pathname.startsWith("/user")
+                    pathname.startsWith("/character")
                       ? activeLinkClasses
                       : inactiveLinkClasses
                   }
@@ -110,16 +113,18 @@ export default function NavbarClient({ session }: NavbarClientProps) {
               </button>
             </Link>
           )}
-          {status === "authenticated" && (
-            <button
-              type="button"
-              className="cursor-pointer rounded-lg bg-orange-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800"
-              onClick={() => signOut()}
-            >
-              로그아웃
-            </button>
+          {status === "authenticated" && user && (
+            <>
+              <button
+                type="button"
+                className="cursor-pointer rounded-lg bg-orange-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800"
+                onClick={() => signOut()}
+              >
+                로그아웃
+              </button>
+              {/* <User user={user} /> */}
+            </>
           )}
-          {/* <User signOut={signOut} user={user} /> */}
 
           <button
             type="button"

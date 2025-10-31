@@ -11,11 +11,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTriangleExclamation,
   faCheckCircle,
+  faSpinner,
+  faAddressCard,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function RegisterPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +60,6 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        console.log(data.error);
         switch (data.error) {
           case "MISSING_REQUIRED_FIELDS":
             setError("이름, 이메일, 비밀번호는 필수입니다.");
@@ -260,9 +259,14 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading || !!success}
-          className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800"
+          className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-orange-500 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800 dark:disabled:hover:bg-orange-600"
         >
-          {loading ? "처리 중..." : "회원가입"}
+          <FontAwesomeIcon
+            icon={loading ? faSpinner : faAddressCard}
+            spin={loading}
+            className="me-1"
+          />
+          {loading ? "로딩 중" : "회원가입"}
         </button>
         <Link
           href={"/login"}

@@ -3,11 +3,10 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
-import bcryptjs from "bcryptjs";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export const authConfig = {
@@ -24,23 +23,36 @@ export const authConfig = {
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        const { data: user, error } = await supabase
+        console.log(email, password);
+
+        const { data: authData, error: authError } =
+          await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          });
+
+        if (authError) {
+          return null;
+        }
+
+        const supabaseService = createClient(
+          process.env.SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        );
+
+        const { data: user, error: profileError } = await supabaseService
           .from("users")
           .select("*")
-          .eq("email", email)
+          .eq("id", authData.user.id)
           .single();
 
-        if (error || !user) {
-          throw new Error("INVALID_CREDENTIALS");
+        if (profileError || !user) {
+          return null;
         }
 
         if (user.register_verify !== null) {
-          throw new Error("EMAIL_NOT_VERIFIED");
+          return null;
         }
-
-        const isPasswordValid = await bcryptjs.compare(password, user.password);
-
-        if (!isPasswordValid) throw new Error("INVALID_CREDENTIALS");
 
         return {
           id: user.id,

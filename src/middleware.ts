@@ -9,7 +9,7 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const { nextUrl } = req;
 
-  const isProtected = nextUrl.pathname.startsWith("/dashboard");
+  const isProtected = nextUrl.pathname.startsWith("/mypage");
 
   if (isProtected && !isLoggedIn) {
     const newUrl = new URL("/login", nextUrl.origin);
@@ -18,12 +18,12 @@ export default auth((req) => {
   }
 
   if (isLoggedIn && nextUrl.pathname === "/login") {
-    return Response.redirect(new URL("/dashboard", nextUrl.origin));
+    return Response.redirect(new URL("/mypage", nextUrl.origin));
   }
 
   return null;
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/mypage", "/login"],
 };

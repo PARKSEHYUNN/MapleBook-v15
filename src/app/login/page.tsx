@@ -7,17 +7,24 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTriangleExclamation,
+  faSpinner,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/mypage";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [saveEmail, setSaveEmail] = useState(false);
+
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,6 +39,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const result = await signIn("credentials", {
@@ -41,7 +49,15 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+        if (result.error === "CredentialsSignin") {
+          setError(
+            "이메일 또는 비밀번호가 올바르지 않거나, 이메일 인증이 완료되지 않았습니다",
+          );
+        } else {
+          setError("알 수 없는 오류가 발생했습니다.");
+        }
+
+        setLoading(false);
       } else if (result?.ok) {
         if (saveEmail) localStorage.setItem("savedEmail", email);
         else localStorage.removeItem("savedEmail");
@@ -49,9 +65,7 @@ export default function LoginPage() {
         router.push(callbackUrl);
       }
     } catch (err) {
-      setError("로그인 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
+      setError("로그인 중 예기치 않은 오류가 발생했습니다.");
     }
   };
 
@@ -130,9 +144,15 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 focus:outline-none dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800"
+          disabled={loading || !!success}
+          className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-orange-500 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800 dark:disabled:hover:bg-orange-600"
         >
-          로그인
+          <FontAwesomeIcon
+            icon={loading ? faSpinner : faRightFromBracket}
+            spin={loading}
+            className="me-1"
+          />
+          {loading ? "로딩 중" : "로그인"}
         </button>
 
         <Link
